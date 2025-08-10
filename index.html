@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mabl 基本E2Eテストページ</title>
+<style>
+/* 全体のスタイル設定 */
+body { font-family: Arial, sans-serif; line-height: 1.6; background: #f7f7f7; color: #333; margin: 0; }
+header { background: #0074D9; color: #fff; padding: 20px; text-align: center; }
+nav { background: #f0f0f0; padding: 10px; }
+nav a { margin-right: 15px; color: #0074D9; text-decoration: none; font-weight: bold; padding: 6px 10px; border-radius: 4px; }
+nav a:hover { background: #0074D9; color: #fff; }
+main { max-width: 900px; margin: 20px auto; padding: 0 20px; }
+section { margin-bottom: 40px; }
+form { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+label { display: block; margin-bottom: 5px; font-weight: bold; }
+input[type="text"], input[type="password"], select { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
+input[type="checkbox"], input[type="radio"] { margin-right: 5px; }
+button, input[type="submit"], .btn { background: #0074D9; color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+button:hover, .btn:hover { background: #005fa3; }
+
+/* メッセージ表示用スタイル */
+.message { display: none; margin-top: 10px; padding: 10px; border-radius: 4px; }
+.success-message { background: #dff0d8; color: #3c763d; }
+/* ログイン成功メッセージの :target ルール */
+#login-success { display: none; }
+#login-success:target { display: block; }
+
+/* 入力が完了したときに成功メッセージを表示 */
+form.dropdown:valid .dropdown-success { display: block; }
+form.radio-gender:valid .gender-success { display: block; }
+form.radio-payment:valid .payment-success { display: block; }
+form.upload:valid .upload-success { display: block; }
+
+/* モーダル用スタイル */
+.modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); }
+.modal:target { display: block; }
+.modal-content { background: #fff; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; position: relative; }
+.modal-close { position: absolute; top: 10px; right: 10px; text-decoration: none; font-size: 20px; color: #333; }
+
+/* アラート用スタイル */
+.alert { display: none; background: #FF4136; color: #fff; padding: 15px; border-radius: 4px; margin-top: 10px; }
+input[type="checkbox"].alert-toggle:checked ~ .alert { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>mabl 基本E2Eテストページ</h1>
+</header>
+<nav>
+  <a href="#login">ログイン</a>
+  <a href="#dropdown">ドロップダウン</a>
+  <a href="#radio">ラジオボタン</a>
+  <a href="#upload">ファイルアップロード</a>
+  <a href="#modalsec">モーダル</a>
+  <a href="#alertsec">アラート</a>
+  <a href="#download">ダウンロード</a>
+</nav>
+<main>
+  <!-- ログインセクション -->
+  <section id="login">
+    <h2>ログインフォーム</h2>
+    <!-- required 属性により空欄の場合はブラウザが警告を表示 -->
+    <form class="login" action="#login-success">
+      <label for="username">ユーザ名またはメールアドレス:</label>
+      <input type="text" id="username" name="username" placeholder="ユーザ名" required>
+      <label for="password">パスワード:</label>
+      <input type="password" id="password" name="password" placeholder="パスワード" required>
+      <label><input type="checkbox" name="remember"> ログイン状態を保持する</label>
+      <input type="submit" value="ログイン" class="login-btn">
+    </form>
+    <!-- ログイン成功時のメッセージ。action のアンカーで表示される -->
+    <div id="login-success" class="message success-message">ログインに成功しました！</div>
+  </section>
+
+  <!-- ドロップダウンセクション -->
+  <section id="dropdown">
+    <h2>ドロップダウン</h2>
+    <form class="dropdown">
+      <label for="country">国を選択してください:</label>
+      <select id="country" name="country" required>
+        <option value="">-- 選択してください --</option>
+        <option value="jp">日本</option>
+        <option value="us">アメリカ</option>
+        <option value="uk">イギリス</option>
+        <option value="fr">フランス</option>
+      </select>
+      <label for="fruits">好きなフルーツを複数選択してください:</label>
+      <select id="fruits" name="fruits" multiple size="4">
+        <option value="apple">りんご</option>
+        <option value="orange">オレンジ</option>
+        <option value="banana">バナナ</option>
+        <option value="grape">ぶどう</option>
+        <option value="pear">なし</option>
+      </select>
+      <!-- 選択完了メッセージ -->
+      <div class="message success-message dropdown-success">選択が完了しました！</div>
+    </form>
+  </section>
+
+  <!-- ラジオボタンセクション -->
+  <section id="radio">
+    <h2>ラジオボタン</h2>
+    <!-- 性別選択用フォーム -->
+    <form class="radio-gender">
+      <p>性別を選択してください:</p>
+      <label><input type="radio" name="gender" value="male" required> 男性</label><br>
+      <label><input type="radio" name="gender" value="female"> 女性</label><br>
+      <label><input type="radio" name="gender" value="other"> その他</label><br>
+      <div class="message success-message gender-success">性別の選択が完了しました！</div>
+    </form>
+    <!-- 支払い方法選択用フォーム -->
+    <form class="radio-payment">
+      <p>支払い方法を選択してください:</p>
+      <label><input type="radio" name="payment" value="credit" required> クレジットカード</label><br>
+      <label><input type="radio" name="payment" value="paypal"> PayPal</label><br>
+      <label><input type="radio" name="payment" value="bank"> 銀行振込</label><br>
+      <div class="message success-message payment-success">支払い方法の選択が完了しました！</div>
+    </form>
+  </section>
+
+  <!-- ファイルアップロードセクション -->
+  <section id="upload">
+    <h2>ファイルアップロード</h2>
+    <form class="upload">
+      <label for="resume">履歴書をアップロードしてください (PDF):</label>
+      <input type="file" id="resume" name="resume" accept="application/pdf" required>
+      <label for="images">画像を選択してください (複数選択可):</label>
+      <input type="file" id="images" name="images" multiple accept="image/*">
+      <input type="submit" value="アップロード">
+      <!-- アップロード完了メッセージ -->
+      <div class="message success-message upload-success">ファイルの選択が完了しました！</div>
+    </form>
+  </section>
+
+  <!-- モーダルセクション -->
+  <section id="modalsec">
+    <h2>モーダル</h2>
+    <p>ボタンをクリックするとモーダルが表示されます。</p>
+    <a href="#modal1" class="btn">モーダルを開く</a>
+    <div id="modal1" class="modal">
+      <div class="modal-content">
+        <a href="#" class="modal-close">&times;</a>
+        <h3>モーダルタイトル</h3>
+        <p>これはモーダルダイアログの内容です。ここには任意のテキストやフォームを配置できます。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- アラートセクション -->
+  <section id="alertsec">
+    <h2>アラート</h2>
+    <p>チェックボックスを切り替えるとアラートが表示/非表示になります。</p>
+    <input type="checkbox" id="alertToggle" class="alert-toggle" hidden>
+    <label for="alertToggle" class="btn">アラートを表示 / 非表示</label>
+    <div class="alert">これはアラートメッセージです！</div>
+  </section>
+
+  <!-- ダウンロードセクション -->
+  <section id="download">
+    <h2>ファイルダウンロード</h2>
+    <p>テスト用にPDFファイルへのダウンロードリンクを用意しています。</p>
+    <a href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" download>ダミーPDFをダウンロード</a>
+  </section>
+</main>
+</body>
+</html>
